@@ -76,3 +76,16 @@ def get_all_table_names():
     cursor.close()
     conn.close()
     return table_names
+
+def get_table_id(table_name):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT TableID FROM Tables WHERE TableName = %s", (table_name,))
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if result:
+        return result[0]
+    else:
+        return None
