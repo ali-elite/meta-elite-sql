@@ -1,3 +1,5 @@
+import psycopg2
+
 from utils import create_connection
 
 
@@ -11,13 +13,17 @@ def add_column(table_id, column_name, data_type, is_nullable, default_value):
     conn.close()
 
 def get_all_columns():
+    """Retrieve all schemas from the database."""
     conn = create_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Columns")
-    columns = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return columns
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM Columns")
+            return cursor.fetchall()  # Returns a list of tuples
+    except psycopg2.Error as e:
+        print(f"Error fetching schemas: {e}")
+        return []
+    finally:
+        conn.close()
 
 def update_column(column_id, new_name, new_data_type, new_is_nullable, new_default_value):
     conn = create_connection()

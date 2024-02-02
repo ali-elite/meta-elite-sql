@@ -1,14 +1,40 @@
+import psycopg2
+
 from utils import create_connection
 
 
-def add_table(table_name, description):
+def add_table(schema_name, table_name, description=''):
+    """
+    Adds a new table with the given name and description to the specified schema.
+    Parameters:
+    - schema_name: The name of the schema to which the table belongs.
+    - table_name: The name of the table to be added.
+    - description: A description for the table.
+    """
     conn = create_connection()
-    cursor = conn.cursor()
-    query = "INSERT INTO Tables (TableName, Description) VALUES (%s, %s)"
-    cursor.execute(query, (table_name, description))
-    conn.commit()
-    cursor.close()
-    conn.close()
+    try:
+        with conn.cursor() as cursor:
+            # First, find the SchemaID based on the provided schema_name
+            cursor.execute("SELECT SchemaID FROM Schemas WHERE SchemaName = %s", (schema_name,))
+            schema_id = cursor.fetchone()
+            if not schema_id:
+                print(f"No schema found with name: {schema_name}")
+                return
+
+            # Insert the new table into the Tables table with the found SchemaID
+            cursor.execute(
+                "INSERT INTO Tables (SchemaID, TableName, Description) VALUES (%s, %s, %s)",
+                (schema_id[0], table_name, description)
+            )
+            conn.commit()
+            print(f"Table '{table_name}' added successfully to schema '{schema_name}'.")
+    except psycopg2.Error as e:
+        print(f"Error adding table: {e}")
+    finally:
+        if conn is not None:
+            conn.close()
+
+
 
 
 def get_all_tables():
