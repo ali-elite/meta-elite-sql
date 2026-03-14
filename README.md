@@ -21,4 +21,4 @@ This project explores the core abstractions of relational database management sy
 - **Database Querying**: SQL
 
 ---
-*Sharif University of Technology - Computer Engineering Department*
+*Sharif University of Technology - Computer Science Department*
